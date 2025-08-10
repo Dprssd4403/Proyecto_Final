@@ -1,24 +1,22 @@
-import { createStackNavigator } from "@react-navigation/stack";
-import { PantallaRegistro } from "../screens/PantallaRegistro";
-import { PersonaInicio } from '../screens/PersonaInicio';
-import { PantallaInicioSesion } from "../screens/PantallaInicio";
+import { createStackNavigator } from '@react-navigation/stack';
+import { PRIMARY_COLOR } from '../commons/constants';
+import { LoginScreen } from '../screens/LoginScreen';
+import { RegisterScreen } from '../screens/RegisterScreen';
+import { HomeScreen } from '../screens/HomeScreen';
 
-//Definir los screens parte de la navegacio y parametros
-//Navegacion por propiedades de StackNavigator
 
-export type RootStackParams = {
-    Inicio: undefined,
-    Registro: undefined,
-    PersonaInicio: { nombre: string, apellido: string, edad: number, correo: string, contrasena: string }
-}
+const Stack = createStackNavigator();
 
-const Stack = createStackNavigator<RootStackParams>();
 export const StackNavigator = () => {
-    return (
-        <Stack.Navigator>
-            <Stack.Screen name="Registro" component={PantallaRegistro} />
-            <Stack.Screen name="Inicio" component={PantallaInicioSesion} />
-            <Stack.Screen name="PersonaInicio" component={PersonaInicio} />
-        </Stack.Navigator>
-    );
-};
+  return (
+    <Stack.Navigator screenOptions={{
+            cardStyle:{
+                backgroundColor:PRIMARY_COLOR
+            }
+        }}>
+      <Stack.Screen name="Login" options={{headerShown: false}} component={LoginScreen} />
+      <Stack.Screen name="Register" options={{headerShown: false}} component={RegisterScreen} />
+      <Stack.Screen name="HomeScreen" options={{headerShown: false}} component={HomeScreen} />
+    </Stack.Navigator>
+  );
+}
