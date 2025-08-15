@@ -1,11 +1,5 @@
 import React, { useState } from "react";
-import {
-  StatusBar,
-  Text,
-  View,
-  Alert,
-  Image,
-} from "react-native";
+import { StatusBar, Text, View, Alert, Image } from "react-native";
 
 import { PRIMARY_COLOR } from "../commons/constants";
 import { BodyComponent } from "../components/BodyComponent";
@@ -15,26 +9,21 @@ import { ButtonComponent } from "../components/ButtonComponent";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { TouchableOpacity } from "react-native";
 import { CommonActions, useNavigation } from "@react-navigation/native";
+import { User } from "../navigator/StackNavigator";
 import { TitleComponent } from "../components/TittleComponent";
+
+//interface para las propiedades
+interface Props {
+  users: User[]; //arreglo con la lista de usuarios
+}
 
 //interface para el objeto del formulario
 interface FormLogin {
   username: string;
   password: string;
 }
-//interface para los objetos de mi arreglo users
-interface User {
-  id: number;
-  name: string;
-  username: string;
-  password: string;
-}
-//arreglo con la lista de usuarios
-const users: User[] = [
-  { id: 1, name: "Christopher", username: "Dprssd", password: "1727053231" },
-  { id: 2, name: "Carlos", username: "caguas", password: "654321" },
-];
-export const LoginScreen = () => {
+
+export const LoginScreen = ({ users }: Props) => {
   //hook useState para manejar el estado de nuestro formulario
   const [formLogin, setFormLogin] = useState<FormLogin>({
     username: "",
@@ -54,12 +43,13 @@ export const LoginScreen = () => {
   };
 
   //funcion para validar el usuario y la contraseña
-  const verifyUser = (): boolean => {
-    return users.some(
-      user =>
+  const verifyUser = () => {
+    const existUser = users.find(
+      (user) =>
         user.username == formLogin.username &&
         user.password == formLogin.password
     );
+    return existUser;
   };
 
   //funcion permitir iniciar sesion
@@ -72,8 +62,8 @@ export const LoginScreen = () => {
       Alert.alert("Error", "Usuario y/o contraseña incorrectos");
       return;
     }
-    Alert.alert("Éxito", "Usuario iniciado correctamente");
-    console.log("Usuario iniciado:", formLogin)
+    //console.log(formLogin);
+    navigation.dispatch(CommonActions.navigate({ name: "HomeScreen" }));
   };
 
   return (

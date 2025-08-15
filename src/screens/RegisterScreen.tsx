@@ -10,25 +10,22 @@ import { ButtonComponent } from "../components/ButtonComponent";
 import { TouchableOpacity } from "react-native";
 import { CommonActions, useNavigation } from "@react-navigation/native";
 import { TitleComponent } from "../components/TittleComponent";
+import { User } from "../navigator/StackNavigator";
+
+interface Props {
+  users: User[];
+  addUser: (user: User) => void;
+}
 
 interface FormRegister {
   name: string;
-  lastname: string;
+  number: number;
   email: string;
   username: string;
   password: string;
 }
 
-interface User {
-  id: number;
-  name: string;
-  lastname: string;
-  email: string;
-  username: string;
-  password: string;
-}
-
-export const RegisterScreen = () => {
+export const RegisterScreen = ({ users, addUser }: Props) => {
   const [hiddenPassword, setHiddenPassword] = useState<boolean>(true);
 
   //funcion para modificar el estado del formulario
@@ -36,53 +33,80 @@ export const RegisterScreen = () => {
     // console.log(property + ": " + value);
     setFormRegister({ ...formRegister, [property]: value });
   };
-
+  const navigation = useNavigation();
   const [formRegister, setFormRegister] = useState<FormRegister>({
     name: "",
-    lastname: "",
+    number: 0,
     email: "",
     username: "",
     password: "",
   });
 
-  const users: User[] = [
-    { id: 1, name: "Christopher", lastname: "Espinosa", email: "christophervivanco2123@gmail.com", username: "Dprssd", password: "1727053231" },
-    { id: 2, name: "Yessica", lastname: "Gamez", email: "yessicaGamez12@gmail.com", username: "Kingdome", password: "654321" },
-  ];
-  const verifyUser = (): boolean => {
-    return users.some(
-      user =>
-        user.name == formRegister.name &&
-        user.lastname == formRegister.lastname &&
-        user.email == formRegister.email &&
-        user.username == formRegister.username &&
-        user.password == formRegister.password
-    );
+  const verifyUser = (): User | undefined => {
+    const existUser = users.find((user) => user.username === formRegister.username)
+    return existUser;
+
   };
-  //funcion permitir registro
-  const handleRegister = (): void => {
-    if (formRegister.name == "" || formRegister.lastname == "" || formRegister.email == "" || formRegister.username == "" || formRegister.password == "") {
+  const getIdUser = (): number => {
+    const getId = users.length + 1;
+    return getId;
+  };
+  const handleSingUp = (): void => {
+    if (
+      formRegister.name == "" ||
+      formRegister.number == 0 ||
+      formRegister.email == "" ||
+      formRegister.username == "" ||
+      formRegister.password == ""
+
+    ) {
       Alert.alert("Error", "Por favor, complete todos los campos");
-      return; //si falta algun campo, nos saca del flujo
-    }
-    if (verifyUser()) {
-      Alert.alert("Error", "No se puede crear el usuario");
       return;
     }
-    Alert.alert("Éxito", "Usuario creado correctamente");
-    console.log("Usuario registrado:", formRegister);
+    if (verifyUser() != undefined) {
+      Alert.alert("Error", "El usuario ya existe");
+      return;
+    }
+
+    const handleSignUp = (): void => {
+      if (
+        formRegister.name == "" ||
+        formRegister.number == 0 ||
+        formRegister.email == "" ||
+        formRegister.username == "" ||
+        formRegister.password == ""
+      ) {
+        Alert.alert("Error", "Por favor, complete todos los campos");
+        return;
+      }
+
+      //validar que no exista el usuario
+      if (verifyUser() != undefined) {
+        Alert.alert("Error", "El usuario ya existe");
+        return;
+      }
+    };
+
+    const newUser: User = {
+      id: getIdUser(),
+      name: formRegister.name,
+      username: formRegister.username,
+      password: formRegister.password,
+    };
+
+  addUser(newUser);
+    Alert.alert('Exito', 'Usuario registrado correctamente');
+    navigation.goBack();
+    //console.log(formRegister);
   };
-  const navigation = useNavigation();
+  //funcion permitir registro
 
   return (
     <View>
       <StatusBar backgroundColor={PRIMARY_COLOR} />
       <TitleComponent title="Registrate" />
       <BodyComponent>
-        <Text style={styles.titleWelcome}>Listo para transformar tu mundo digital</Text>
-        <Text style={styles.textDescription}>
-          Innovación que transforma tu mundo digital
-        </Text>
+
         <View style={styles.containerForm}>
           <InputComponent
             placeholder="Nombre"
@@ -91,10 +115,10 @@ export const RegisterScreen = () => {
             property="name"
           />
           <InputComponent
-            placeholder="Apellido"
-            keyboardType="default"
+            placeholder="Numero telefonico"
+            keyboardType="number-pad"
             changeForm={changeForm}
-            property="lastname"
+            property="number"
           />
           <InputComponent
             placeholder="Correo electronico"
@@ -123,7 +147,7 @@ export const RegisterScreen = () => {
             onPress={() => setHiddenPassword(!hiddenPassword)}
           />
         </View>
-        <ButtonComponent textButton="Registrarse" handleLogin={handleRegister}/>
+        <ButtonComponent textButton="Registrarse" handleLogin={handleSingUp} />
         <TouchableOpacity
           onPress={() =>
             navigation.dispatch(CommonActions.navigate({ name: "Login" }))

@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react'
 import { StyleSheet, Text, useWindowDimensions, View } from 'react-native'
-import { SECONDARY_COLOR } from '../commons/constants';
+import { PRIMARY_COLOR, SECONDARY_COLOR } from '../commons/constants';
 
 //Componente reutilizable
 interface Props{
