@@ -9,8 +9,9 @@ import { InputComponent } from "../components/InputComponent";
 import { ButtonComponent } from "../components/ButtonComponent";
 import { TouchableOpacity } from "react-native";
 import { CommonActions, useNavigation } from "@react-navigation/native";
-import { TitleComponent } from "../components/TittleComponent";
+
 import { User } from "../navigator/StackNavigator";
+import { TitleComponent } from "../components/TitleComponent";
 
 interface Props {
   users: User[];
@@ -23,10 +24,13 @@ interface FormRegister {
   email: string;
   username: string;
   password: string;
+  confirmPassword: string;
 }
 
 export const RegisterScreen = ({ users, addUser }: Props) => {
   const [hiddenPassword, setHiddenPassword] = useState<boolean>(true);
+
+  const [hiddenConfirmPassword, setHiddenConfirmPassword] = useState<boolean>(true);
 
   //funcion para modificar el estado del formulario
   const changeForm = (property: string, value: string): void => {
@@ -40,12 +44,14 @@ export const RegisterScreen = ({ users, addUser }: Props) => {
     email: "",
     username: "",
     password: "",
+    confirmPassword: "",
   });
 
   const verifyUser = (): User | undefined => {
-    const existUser = users.find((user) => user.username === formRegister.username)
+    const existUser = users.find(
+      (user) => user.username === formRegister.username
+    );
     return existUser;
-
   };
   const getIdUser = (): number => {
     const getId = users.length + 1;
@@ -53,52 +59,40 @@ export const RegisterScreen = ({ users, addUser }: Props) => {
   };
   const handleSingUp = (): void => {
     if (
-      formRegister.name == "" ||
-      formRegister.number == 0 ||
-      formRegister.email == "" ||
-      formRegister.username == "" ||
-      formRegister.password == ""
-
+      formRegister.name === "" ||
+      formRegister.number === 0 ||
+      formRegister.email === "" ||
+      formRegister.username === "" ||
+      formRegister.password === "" ||
+      formRegister.confirmPassword === ""
     ) {
       Alert.alert("Error", "Por favor, complete todos los campos");
       return;
     }
-    if (verifyUser() != undefined) {
-      Alert.alert("Error", "El usuario ya existe");
+
+    if (formRegister.password !== formRegister.confirmPassword) {
+      Alert.alert("Error", "Las contraseñas no coinciden");
       return;
     }
 
-    const handleSignUp = (): void => {
-      if (
-        formRegister.name == "" ||
-        formRegister.number == 0 ||
-        formRegister.email == "" ||
-        formRegister.username == "" ||
-        formRegister.password == ""
-      ) {
-        Alert.alert("Error", "Por favor, complete todos los campos");
-        return;
-      }
-
-      //validar que no exista el usuario
-      if (verifyUser() != undefined) {
-        Alert.alert("Error", "El usuario ya existe");
-        return;
-      }
-    };
+    if (verifyUser() !== undefined) {
+      Alert.alert("Error", "El usuario ya existe");
+      return;
+    }
 
     const newUser: User = {
       id: getIdUser(),
       name: formRegister.name,
       username: formRegister.username,
       password: formRegister.password,
+      confirmPassword: formRegister.confirmPassword,
     };
 
-  addUser(newUser);
-    Alert.alert('Exito', 'Usuario registrado correctamente');
+    addUser(newUser);
+    Alert.alert("Éxito", "Usuario registrado correctamente");
     navigation.goBack();
-    //console.log(formRegister);
   };
+
   //funcion permitir registro
 
   return (
@@ -106,7 +100,6 @@ export const RegisterScreen = ({ users, addUser }: Props) => {
       <StatusBar backgroundColor={PRIMARY_COLOR} />
       <TitleComponent title="Registrate" />
       <BodyComponent>
-
         <View style={styles.containerForm}>
           <InputComponent
             placeholder="Nombre"
@@ -132,19 +125,36 @@ export const RegisterScreen = ({ users, addUser }: Props) => {
             changeForm={changeForm}
             property="username"
           />
+          <View>
+            <InputComponent
+              placeholder="Contraseña"
+              keyboardType="default"
+              changeForm={changeForm}
+              property="password"
+              isPassword={hiddenPassword}
+            />
+
+            <Icon
+              name={hiddenPassword ? "visibility" : "visibility-off"}
+              size={20}
+              color={PRIMARY_COLOR}
+              style={styles.iconForm}
+              onPress={() => setHiddenPassword(!hiddenPassword)}
+            />
+          </View>
           <InputComponent
-            placeholder="Contraseña"
+            placeholder="Confirmar Contraseña"
             keyboardType="default"
             changeForm={changeForm}
-            property="password"
-            isPassword={hiddenPassword}
+            property="confirmPassword"
+            isPassword={hiddenConfirmPassword}
           />
           <Icon
-            name={hiddenPassword ? "visibility" : "visibility-off"}
+            name={hiddenConfirmPassword ? "visibility" : "visibility-off"}
             size={20}
             color={PRIMARY_COLOR}
             style={styles.iconForm}
-            onPress={() => setHiddenPassword(!hiddenPassword)}
+            onPress={() => setHiddenConfirmPassword(!hiddenConfirmPassword)}
           />
         </View>
         <ButtonComponent textButton="Registrarse" handleLogin={handleSingUp} />
@@ -160,5 +170,4 @@ export const RegisterScreen = ({ users, addUser }: Props) => {
       </BodyComponent>
     </View>
   );
-
 };
